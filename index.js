@@ -5,8 +5,10 @@ const generateArray = (number) => {
     array.length = 0;
 
     for (let i = 0; i < number; i++) {
-        const index = i;
         const element = Math.floor(Math.random() * 1000);
+
+        array.length += 1;
+        const index = array.length - 1;
         
         renderArrayElement(index, element);
     }
