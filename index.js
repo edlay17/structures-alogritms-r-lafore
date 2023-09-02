@@ -1,86 +1,95 @@
 const getRandomNumner = () => Math.floor(Math.random() * 1000);
 
-const clearArray = () => {
-    const $array = document.getElementById('array');
-    $array.innerHTML = '';
-}
-
-const renderArrayElement = (index, element) => {
-    const $arrayRow = document.createElement('array-row');
-    const $arrayIndex = document.createElement('array-index');
-    const $arrayElement = document.createElement('array-element');
-    const $arrayElementText = document.createElement('span');
-
-    $arrayRow.setAttribute('id', index);
-    $arrayIndex.innerText = index;
-    $arrayElementText.innerText = element;
-
-    const gerenateColor = () => {
-        return Math.floor(Math.random() * (155 - 0));
+class ArrayDom {
+    constructor(rootId) {
+        this.$array = document.getElementById(rootId);
     }
 
-    const r = gerenateColor();
-    const g = gerenateColor();
-    const b = gerenateColor();
-    $arrayElement.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    getArrayRow(index) {
+        return this.$array.querySelector(`.id-${index}`);
+    }
 
-    $arrayRow.classList.add('array-row');
-    $arrayIndex.classList.add('array-index');
-    $arrayElement.classList.add('array-element');
+    renderArrayElement(index, element) {
+        const $arrayRow = document.createElement('array-row');
+        const $arrayIndex = document.createElement('array-index');
+        const $arrayElement = document.createElement('array-element');
+        const $arrayElementText = document.createElement('span');
+    
+        $arrayRow.classList.add(`id-${index}`);
+        $arrayIndex.innerText = index;
+        $arrayElementText.innerText = element;
+    
+        const gerenateColor = () => {
+            return Math.floor(Math.random() * (155 - 0));
+        }
+    
+        const r = gerenateColor();
+        const g = gerenateColor();
+        const b = gerenateColor();
+        $arrayElement.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+    
+        $arrayRow.classList.add('array-row');
+        $arrayIndex.classList.add('array-index');
+        $arrayElement.classList.add('array-element');
+    
+        this.$array.appendChild($arrayRow);
+        $arrayRow.appendChild($arrayIndex);
+        $arrayRow.appendChild($arrayElement);
+        $arrayElement.appendChild($arrayElementText);
+    }
 
-    const $array = document.getElementById('array');
-    $array.appendChild($arrayRow);
-    $arrayRow.appendChild($arrayIndex);
-    $arrayRow.appendChild($arrayElement);
-    $arrayElement.appendChild($arrayElementText);
-}
+    clearArray() {
+        this.$array.innerHTML = '';
+    }
 
-const changeArrayElement = (index, element) => {
-    const $arrayRow = document.getElementById(index);
-    const $arrayElementText = $arrayRow.querySelector('array-element span');
-    $arrayElementText.innerText = element;
+    removeArrayElement(index) {
+        const $arrayRow = this.getArrayRow(index);
+        $arrayRow.remove();
+    }
+
+    changeArrayElement(index, element) {
+        const $arrayRow = this.getArrayRow(index);
+        const $arrayElementText = $arrayRow.querySelector('array-element span');
+        $arrayElementText.innerText = element;
+    }
 }
 
 class Array {
-    // need to checking dublicates
+    // need to check dublicates
     constructor(number) {
         this.array = {};
+        this.DOM = new ArrayDom('array');
         this.generate(number);
     }
   
     generate(number) {
-        clearArray();
+        this.DOM.clearArray();
 
         const array = this.array;
 
         array.length = 0;
     
         for (let i = 0; i < number; i++) {
-            array.length += 1;
-            const index = array.length - 1;
-            
-            this[index] = getRandomNumner();
-            renderArrayElement(index, this[index]);
+            this.push(getRandomNumner());
         }
-
     }
 
     push = (element) => {
-        this.array.length;
+        const array = this.array;
 
-        const index = this.array.length;
-        this[index] = element;
-        this.array.length = this.array.length + 1;
+        const index = array.length;
+        array[index] = element;
+        array.length = array.length + 1;
 
-        renderArrayElement(index, element);
+        this.DOM.renderArrayElement(index, element);
     } 
 
     findIndex = (element) => {
-        const length = this.array.length;
+        const array = this.array;
         let index = -1;
 
-        for (let i = 0; i < length; i++) {
-            if (this[i] === element) {
+        for (let i = 0; i < array.length; i++) {
+            if (array[i] === element) {
                 index = i;
             }
         }
@@ -89,31 +98,36 @@ class Array {
     }
 
     shift = (index) => {
-        if (index < this.length || index >= this.length) {
+        const array = this.array;
+
+        if (index < 0 || index >= array.length) {
             return;
         }
 
-        if (index < this.length - 1) {
-            for (let i = index; i < this.length - 1; i++) {
-                this[i] = this[i+1];
-                changeArrayElement(i, this[i+1]);
+        if (index < array.length - 1) {
+            for (let i = index; i < array.length - 1; i++) {
+                array[i] = array[i+1];
+                this.DOM.changeArrayElement(i, array[i+1]);
+                debugger;
             }
         }
 
-        this.length = this.length - 1;
+        delete array[array.length - 1];
+        this.DOM.removeArrayElement(array.length - 1);
+        array.length = array.length - 1;
     }
 
     delete = (element) => {
-        // need to delete last prop
+        const array = this.array;
+
         const index = this.findIndex(element);
-        if (index !== undefined) {
-            this[index] = undefined;
-            changeArrayElement(index, 'null');
-            this.shift(index);
-            debugger;
-        }
+
+        if (index === undefined) return;
+
+        array[index] = undefined;
+        this.DOM.changeArrayElement(index, 'null');
+        debugger;
+
+        this.shift(index);
     }
 }
-
-let array = new Array(10);
-array.push(100);
