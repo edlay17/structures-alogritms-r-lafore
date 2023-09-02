@@ -35,13 +35,22 @@ const renderArrayElement = (index, element) => {
     $arrayElement.appendChild($arrayElementText);
 }
 
+const changeArrayElement = (index, element) => {
+    const $arrayRow = document.getElementById(index);
+    const $arrayElementText = $arrayRow.querySelector('array-element span');
+    $arrayElementText.innerText = element;
+}
+
 class Array {
+    // need to checking dublicates
     constructor(number) {
         this.array = {};
         this.generate(number);
     }
   
     generate(number) {
+        clearArray();
+
         const array = this.array;
 
         array.length = 0;
@@ -50,7 +59,8 @@ class Array {
             array.length += 1;
             const index = array.length - 1;
             
-            renderArrayElement(index, getRandomNumner());
+            this[index] = getRandomNumner();
+            renderArrayElement(index, this[index]);
         }
 
     }
@@ -59,10 +69,50 @@ class Array {
         this.array.length;
 
         const index = this.array.length;
+        this[index] = element;
         this.array.length = this.array.length + 1;
 
         renderArrayElement(index, element);
     } 
+
+    findIndex = (element) => {
+        const length = this.array.length;
+        let index = -1;
+
+        for (let i = 0; i < length; i++) {
+            if (this[i] === element) {
+                index = i;
+            }
+        }
+
+        return index !== -1 ? index : undefined;
+    }
+
+    shift = (index) => {
+        if (index < this.length || index >= this.length) {
+            return;
+        }
+
+        if (index < this.length - 1) {
+            for (let i = index; i < this.length - 1; i++) {
+                this[i] = this[i+1];
+                changeArrayElement(i, this[i+1]);
+            }
+        }
+
+        this.length = this.length - 1;
+    }
+
+    delete = (element) => {
+        // need to delete last prop
+        const index = this.findIndex(element);
+        if (index !== undefined) {
+            this[index] = undefined;
+            changeArrayElement(index, 'null');
+            this.shift(index);
+            debugger;
+        }
+    }
 }
 
 let array = new Array(10);
