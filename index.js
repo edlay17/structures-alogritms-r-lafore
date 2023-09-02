@@ -91,6 +91,7 @@ class Array {
         for (let i = 0; i < array.length; i++) {
             if (array[i] === element) {
                 index = i;
+                break;
             }
         }
 
