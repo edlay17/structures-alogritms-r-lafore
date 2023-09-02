@@ -1,25 +1,17 @@
-let array = {};
+const getRandomNumner = () => Math.floor(Math.random() * 1000);
 
-const generateArray = (number) => {
-    array = {};
-    array.length = 0;
-
-    for (let i = 0; i < number; i++) {
-        const element = Math.floor(Math.random() * 1000);
-
-        array.length += 1;
-        const index = array.length - 1;
-        
-        renderArrayElement(index, element);
-    }
+const clearArray = () => {
+    const $array = document.getElementById('array');
+    $array.innerHTML = '';
 }
 
 const renderArrayElement = (index, element) => {
-    const $arrayRow = document.createElement("array-row");
-    const $arrayIndex = document.createElement("array-index");
-    const $arrayElement = document.createElement("array-element");
-    const $arrayElementText = document.createElement("span");
+    const $arrayRow = document.createElement('array-row');
+    const $arrayIndex = document.createElement('array-index');
+    const $arrayElement = document.createElement('array-element');
+    const $arrayElementText = document.createElement('span');
 
+    $arrayRow.setAttribute('id', index);
     $arrayIndex.innerText = index;
     $arrayElementText.innerText = element;
 
@@ -32,9 +24,9 @@ const renderArrayElement = (index, element) => {
     const b = gerenateColor();
     $arrayElement.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
 
-    $arrayRow.classList.add("array-row");
-    $arrayIndex.classList.add("array-index");
-    $arrayElement.classList.add("array-element");
+    $arrayRow.classList.add('array-row');
+    $arrayIndex.classList.add('array-index');
+    $arrayElement.classList.add('array-element');
 
     const $array = document.getElementById('array');
     $array.appendChild($arrayRow);
@@ -43,16 +35,35 @@ const renderArrayElement = (index, element) => {
     $arrayElement.appendChild($arrayElementText);
 }
 
-generateArray(50);
-debugger;
+class Array {
+    constructor(number) {
+        this.array = {};
+        this.generate(number);
+    }
+  
+    generate(number) {
+        const array = this.array;
 
-/*
-        <div class="array-row">
-            <div class="array-index">
-                0
-            </div>
-            <div class="array-element">
-                14
-            </div>
-        </div>
-*/
+        array.length = 0;
+    
+        for (let i = 0; i < number; i++) {
+            array.length += 1;
+            const index = array.length - 1;
+            
+            renderArrayElement(index, getRandomNumner());
+        }
+
+    }
+
+    push = (element) => {
+        this.array.length;
+
+        const index = this.array.length;
+        this.array.length = this.array.length + 1;
+
+        renderArrayElement(index, element);
+    } 
+}
+
+let array = new Array(10);
+array.push(100);
