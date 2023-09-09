@@ -3,6 +3,7 @@ const getRandomNumner = () => Math.floor(Math.random() * 1000);
 class ArrayDom {
     constructor(rootId) {
         this.$array = document.getElementById(rootId);
+        this.activeIndex = -1;
     }
 
     getArrayRow(index) {
@@ -19,15 +20,17 @@ class ArrayDom {
         $arrayIndex.innerText = index;
         $arrayElementText.innerText = element;
     
+        /*
         const gerenateColor = () => {
             return Math.floor(Math.random() * (155 - 0));
         }
-    
+
         const r = gerenateColor();
         const g = gerenateColor();
         const b = gerenateColor();
         $arrayElement.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-    
+        */
+
         $arrayRow.classList.add('array-row');
         $arrayIndex.classList.add('array-index');
         $arrayElement.classList.add('array-element');
@@ -52,10 +55,27 @@ class ArrayDom {
         const $arrayElementText = $arrayRow.querySelector('array-element span');
         $arrayElementText.innerText = element;
     }
+
+    setActive(index = -1) {
+        if (this.activeIndex !== -1) {
+            const $arrayRow = this.getArrayRow(this.activeIndex);
+            const $arrayElement = $arrayRow.querySelector('array-element');
+            $arrayElement.style.backgroundColor = '';
+        }
+
+        if (index !== -1) {
+            const $arrayRow = this.getArrayRow(index);
+            const $arrayElement = $arrayRow.querySelector('array-element');
+            $arrayElement.style.backgroundColor = 'green';
+        }
+        
+        this.activeIndex = index;
+    }
 }
 
 class Array {
-    // need to check dublicates
+    // array without dublicates
+
     constructor(number) {
         this.array = {};
         this.DOM = new ArrayDom('array');
@@ -77,11 +97,15 @@ class Array {
     push = (element) => {
         const array = this.array;
 
-        const index = array.length;
-        array[index] = element;
-        array.length = array.length + 1;
-
-        this.DOM.renderArrayElement(index, element);
+        if (this.findIndex(element) === undefined) {
+            const index = array.length;
+            array[index] = element;
+            array.length = array.length + 1;
+    
+            this.DOM.renderArrayElement(index, element);
+            this.DOM.setActive(index);
+            debugger;
+        }
     } 
 
     findIndex = (element) => {
@@ -89,6 +113,8 @@ class Array {
         let index = -1;
 
         for (let i = 0; i < array.length; i++) {
+            this.DOM.setActive(i);
+            debugger;
             if (array[i] === element) {
                 index = i;
                 break;
@@ -109,6 +135,7 @@ class Array {
             for (let i = index; i < array.length - 1; i++) {
                 array[i] = array[i+1];
                 this.DOM.changeArrayElement(i, array[i+1]);
+                this.DOM.setActive(i);
                 debugger;
             }
         }
@@ -127,8 +154,15 @@ class Array {
 
         array[index] = undefined;
         this.DOM.changeArrayElement(index, 'null');
+        this.DOM.setActive(index);
         debugger;
 
         this.shift(index);
     }
 }
+
+console.log('use debugger to see all iterations');
+console.log('const array = new Array(number);');
+console.log('array.push(element);');
+console.log('array.delete(element);');
+console.log('array.findIndex(element);');
