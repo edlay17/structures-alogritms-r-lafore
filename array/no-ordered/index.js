@@ -102,17 +102,19 @@ class Array {
     }
 
     pushS = (element) => {
-        const array = this.array;
+        if (!isNaN(element)) {
+            const array = this.array;
 
-        if (this.findIndexS(element) === undefined) {
-            const index = array.length;
-            array[index] = element;
-            array.length = array.length + 1;
-    
-            this.DOM.renderArrayElement(index, element);
-            this.DOM.setActive(index);
-            this.iterationsCount = this.iterationsCount + 1;
-            debugger;
+            if (this.findIndexS(element) === undefined) {
+                const index = array.length;
+                array[index] = element;
+                array.length = array.length + 1;
+        
+                this.DOM.renderArrayElement(index, element);
+                this.DOM.setActive(index);
+                this.iterationsCount = this.iterationsCount + 1;
+                debugger;
+            }
         }
     } 
 
@@ -122,8 +124,6 @@ class Array {
     }
 
     findIndexS = (element) => {
-        // need to check !isNaN
-
         const array = this.array;
         let index = -1;
 
