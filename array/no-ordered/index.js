@@ -1,9 +1,10 @@
 const getRandomNumner = () => Math.floor(Math.random() * 1000);
 
 class ArrayDom {
-    constructor(rootId) {
+    constructor(rootId, iterationsId) {
         this.$array = document.getElementById(rootId);
         this.activeIndex = -1;
+        this.$iterations = document.getElementById(iterationsId);
     }
 
     getArrayRow(index) {
@@ -19,17 +20,6 @@ class ArrayDom {
         $arrayRow.classList.add(`id-${index}`);
         $arrayIndex.innerText = index;
         $arrayElementText.innerText = element;
-    
-        /*
-        const gerenateColor = () => {
-            return Math.floor(Math.random() * (155 - 0));
-        }
-
-        const r = gerenateColor();
-        const g = gerenateColor();
-        const b = gerenateColor();
-        $arrayElement.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
-        */
 
         $arrayRow.classList.add('array-row');
         $arrayIndex.classList.add('array-index');
@@ -71,18 +61,30 @@ class ArrayDom {
         
         this.activeIndex = index;
     }
+
+    changeIterationsCount(value) {
+        this.$iterations.innerText = value;
+    }
 }
 
 class Array {
-    // array without dublicates
-
     constructor(number) {
         this.array = {};
-        this.DOM = new ArrayDom('array');
+        this.DOM = new ArrayDom('array', 'iterations');
         this.generate(number);
+    }
+
+    set iterationsCount(value) {
+        this.DOM.changeIterationsCount(value);
+        this._iterationsCount = value;
+    }
+
+    get iterationsCount() {
+        return this._iterationsCount;
     }
   
     generate(number) {
+        this.iterationsCount = 0;
         this.DOM.clearArray();
 
         const array = this.array;
@@ -90,30 +92,44 @@ class Array {
         array.length = 0;
     
         for (let i = 0; i < number; i++) {
-            this.push(getRandomNumner());
+            this.pushS(getRandomNumner());
         }
     }
 
     push = (element) => {
+        this.iterationsCount = 0;
+        this.pushS(element);
+    }
+
+    pushS = (element) => {
         const array = this.array;
 
-        if (this.findIndex(element) === undefined) {
+        if (this.findIndexS(element) === undefined) {
             const index = array.length;
             array[index] = element;
             array.length = array.length + 1;
     
             this.DOM.renderArrayElement(index, element);
             this.DOM.setActive(index);
+            this.iterationsCount = this.iterationsCount + 1;
             debugger;
         }
     } 
 
     findIndex = (element) => {
+        this.iterationsCount = null;
+        this.pushS(element);
+    }
+
+    findIndexS = (element) => {
+        // need to check !isNaN
+
         const array = this.array;
         let index = -1;
 
         for (let i = 0; i < array.length; i++) {
             this.DOM.setActive(i);
+            this.iterationsCount = this.iterationsCount + 1;
             debugger;
             if (array[i] === element) {
                 index = i;
@@ -136,6 +152,7 @@ class Array {
                 array[i] = array[i+1];
                 this.DOM.changeArrayElement(i, array[i+1]);
                 this.DOM.setActive(i);
+                this.iterationsCount = this.iterationsCount + 1;
                 debugger;
             }
         }
@@ -146,15 +163,21 @@ class Array {
     }
 
     delete = (element) => {
+        this.iterationsCount = null;
+        this.deleteS(element);
+    }
+
+    deleteS = (element) => {
         const array = this.array;
 
-        const index = this.findIndex(element);
+        const index = this.findIndexS(element);
 
         if (index === undefined) return;
 
         array[index] = undefined;
         this.DOM.changeArrayElement(index, 'null');
         this.DOM.setActive(index);
+        this.iterationsCount = this.iterationsCount + 1;
         debugger;
 
         this.shift(index);
