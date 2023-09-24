@@ -1,81 +1,12 @@
-const getRandomNumner = () => Math.floor(Math.random() * 1000);
-
-class ArrayDom {
-    constructor(rootId, iterationsId) {
-        this.$array = document.getElementById(rootId);
-        this.activeIndex = -1;
-        this.$iterations = document.getElementById(iterationsId);
-    }
-
-    getArrayRow(index) {
-        return this.$array.querySelector(`.id-${index}`);
-    }
-
-    renderArrayElement(index, element) {
-        const $arrayRow = document.createElement('array-row');
-        const $arrayIndex = document.createElement('array-index');
-        const $arrayElement = document.createElement('array-element');
-        const $arrayElementText = document.createElement('span');
-    
-        $arrayRow.classList.add(`id-${index}`);
-        $arrayIndex.innerText = index;
-        $arrayElementText.innerText = element;
-
-        $arrayRow.classList.add('array-row');
-        $arrayIndex.classList.add('array-index');
-        $arrayElement.classList.add('array-element');
-    
-        this.$array.appendChild($arrayRow);
-        $arrayRow.appendChild($arrayIndex);
-        $arrayRow.appendChild($arrayElement);
-        $arrayElement.appendChild($arrayElementText);
-    }
-
-    clearArray() {
-        this.$array.innerHTML = '';
-    }
-
-    removeArrayElement(index) {
-        const $arrayRow = this.getArrayRow(index);
-        $arrayRow.remove();
-    }
-
-    changeArrayElement(index, element) {
-        const $arrayRow = this.getArrayRow(index);
-        const $arrayElementText = $arrayRow.querySelector('array-element span');
-        $arrayElementText.innerText = element;
-    }
-
-    setActive(index = -1) {
-        if (this.activeIndex !== -1) {
-            const $arrayRow = this.getArrayRow(this.activeIndex);
-            const $arrayElement = $arrayRow.querySelector('array-element');
-            $arrayElement.style.backgroundColor = '';
-        }
-
-        if (index !== -1) {
-            const $arrayRow = this.getArrayRow(index);
-            const $arrayElement = $arrayRow.querySelector('array-element');
-            $arrayElement.style.backgroundColor = 'green';
-        }
-        
-        this.activeIndex = index;
-    }
-
-    changeIterationsCount(value) {
-        this.$iterations.innerText = value;
-    }
-}
-
-class Array {
+class Array extends ArrayDOM {
     constructor(number) {
+        super();
         this.array = {};
-        this.DOM = new ArrayDom('array', 'iterations');
         this.generate(number);
     }
 
     set iterationsCount(value) {
-        this.DOM.changeIterationsCount(value);
+        this.changeIterationsCount(value);
         this._iterationsCount = value;
     }
 
@@ -85,7 +16,7 @@ class Array {
   
     generate(number) {
         this.iterationsCount = 0;
-        this.DOM.clearArray();
+        this.clearArray();
 
         const array = this.array;
 
@@ -110,8 +41,8 @@ class Array {
                 array[index] = element;
                 array.length = array.length + 1;
         
-                this.DOM.renderArrayElement(index, element);
-                this.DOM.setActive(index);
+                this.renderArrayElement(index, element);
+                this.setActive(index);
                 this.iterationsCount = this.iterationsCount + 1;
                 debugger;
             }
@@ -119,7 +50,7 @@ class Array {
     } 
 
     findIndex = (element) => {
-        this.iterationsCount = null;
+        this.iterationsCount = 0;
         this.pushS(element);
     }
 
@@ -128,7 +59,7 @@ class Array {
         let index = -1;
 
         for (let i = 0; i < array.length; i++) {
-            this.DOM.setActive(i);
+            this.setActive(i);
             this.iterationsCount = this.iterationsCount + 1;
             debugger;
             if (array[i] === element) {
@@ -150,20 +81,21 @@ class Array {
         if (index < array.length - 1) {
             for (let i = index; i < array.length - 1; i++) {
                 array[i] = array[i+1];
-                this.DOM.changeArrayElement(i, array[i+1]);
-                this.DOM.setActive(i);
+                this.changeArrayElement(i, array[i+1]);
+                this.setActive(i);
                 this.iterationsCount = this.iterationsCount + 1;
                 debugger;
             }
         }
 
         delete array[array.length - 1];
-        this.DOM.removeArrayElement(array.length - 1);
+        this.removeArrayElement(array.length - 1);
         array.length = array.length - 1;
+        this.iterationsCount = this.iterationsCount + 1;
     }
 
     delete = (element) => {
-        this.iterationsCount = null;
+        this.iterationsCount = 0;
         this.deleteS(element);
     }
 
@@ -175,8 +107,8 @@ class Array {
         if (index === undefined) return;
 
         array[index] = undefined;
-        this.DOM.changeArrayElement(index, 'null');
-        this.DOM.setActive(index);
+        this.changeArrayElement(index, 'null');
+        this.setActive(index);
         this.iterationsCount = this.iterationsCount + 1;
         debugger;
 

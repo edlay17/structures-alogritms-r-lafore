@@ -1,21 +1,20 @@
-## No ordered array without dublicates
+## No ordered array
 
 ### Efficiency
-|  Operation | Number of iterations |
-|---|---|
-|find|N/2|
-|insert|N + 1|
-|delete|N/2 (find) + N/2 (move)|
+|  Operation | Number of iterations | Number of it. without dublicates |
+|---|---|---|
+|find|N/2|N/2|
+|insert|1|N + 1|
+|delete|N/2 (find) + N/2 (move)|N/2 (find) + N/2 (move)|
 
 ### Features of an unsorted array
-1) long insert (need to check dublicates)
-2) slow find
+1) very simple algoritms
+2) fast insert (slow without dublicates)
+3) slow find
 
 
 ### Summary
-Because duplicates are not allowed, insertion takes a long time.
-
-Due to the fact that there are no duplicates when searching, there is no need to check the entire array.
+Insert is very fast, but because duplicates are not allowed, insertion takes a long time.
 
 ## How to use
 open index.html and open web developer console
