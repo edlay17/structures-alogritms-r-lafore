@@ -118,26 +118,10 @@ console.log ('========');
 /*
     Implement a structure based on ArrayBuffer
 
-   ```js
-   const jackBlack = Structure([
-     ['name', 'utf16', 10], // Число - это максимальное количество символов
-     ['lastName', 'utf16', 10],
-     ['age', 'u16'] // uint16
-   ]);
-   
-   jackBlack.set('name', 'Jack');
-   jackBlack.set('lastName', 'Black');
-   jackBlack.set('age', 53);
-   
-   console.log(jackBlack.get('name')); // 'Jack'
-   ```  
-
-
-
-   const johnDoe = Structure([
-    ['firstName', 'utf16', 12], // The number is the maximum number of characters
-    ['lastName', 'utf16', 12],
-    ['age', 'u16'] // uint16
+    const johnDoe = Structure([
+        ['firstName', 'utf16', 12], // The number is the maximum number of characters
+        ['lastName', 'utf16', 12],
+        ['age', 'u16'] // uint16
     ]);
 
     johnDoe.set('firstName', 'John');
