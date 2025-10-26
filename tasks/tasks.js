@@ -134,18 +134,24 @@ console.log ('========');
 */
 
 function Structure(data) {
-    const bufferedData = {};
+    (function validateTypes(){
+        data.forEach((field) => {
+            const type = field[1];
 
-    data.forEach((field) => {
+            if (type !== 'utf16' && type !== 'u16') {
+                throw new Error('Encoding / format is not supporting');
+            }
+        })
+    })();
+
+    const fields = [];
+
+    const totalDataBytesCount = data.reduce((accumulator, field) => {
         const [
             title,
             type,
             length,
         ] = field;
-
-        if (type !== 'utf16' && type !== 'u16') {
-            throw new Error('Encoding / format is not supporting');
-        }
 
         const bytesCount = (() => {
             switch (type) {
@@ -156,54 +162,61 @@ function Structure(data) {
             }
         })();
 
-        const buffer = new ArrayBuffer(bytesCount);
+        fields.push({
+            title,
+            type,
+            length,
+            bytesCount,
+            bytesFrom: accumulator,
+        })
 
-        if (type === 'utf16') {
-            const view = new Uint16Array(buffer);
-            bufferedData[title] = {
-                view,
-                type,
-                length,
-                usedLength: 0,
-            }
-        } else if (type === 'u16') {
-            const view = new Uint16Array(buffer);
-            bufferedData[title] = {
-                view,
-                type,
-                usedLength: 0,
-            };
-        }
+        return accumulator + bytesCount;
+    }, 0);
+
+    const buffer = new ArrayBuffer(totalDataBytesCount);
+
+    fields.forEach((field) => {
+        const {
+            bytesCount,
+            bytesFrom,
+        } = field;
+
+        field.view = new Uint16Array(buffer, bytesFrom, bytesCount / 2);
     })
 
     return {
         set(title, value) {
-            if (!bufferedData[title]) {
+            const field = fields.find((field) => field.title === title);
+
+            if (!field) {
                 throw new Error('Invalid title');
             }
 
-            const {
-                view,
-                type,
-                length
-            } = bufferedData[title]
-
-            if (type === 'utf16') {
-                this.setUtf16(value, view, length);
-            } else if (type === 'u16') {
-                this.setU16(value, view);
+            if (field.type === 'utf16') {
+                this.setUtf16(field, value);
+            } else if (field.type === 'u16') {
+                this.setU16(field, value);
             }
 
-            bufferedData[title].usedLength = value.length;
+            field.usedLength = value.length;
         },
-        setU16(value, view) {
+        setU16(field, value) {
+            const {
+                view
+            } = field;
+
             if (isNaN(value) || value < 0 || value > 65535) {
                 throw new Error('Invalid value');
             }
 
             view[0] = value;
         },
-        setUtf16(value, view, length) {
+        setUtf16(field, value) {
+            const {
+                view,
+                length,
+            } = field;
+
             if (value.length > length) {
                 throw new Error('Invalid value');
             }
@@ -218,27 +231,33 @@ function Structure(data) {
             }
         },
         get(title) {
-            if (!bufferedData[title]) {
+            const field = fields.find((field) => field.title === title);
+
+            if (!field) {
                 throw new Error('Invalid title');
             }
 
-            const {
-                view,
-                type,
-                usedLength,
-            } = bufferedData[title];
-
-            if (type === 'utf16') {
-                return this.getUtf16(view, usedLength);
-            } else if (type === 'u16') {
-                return this.getU16(view);
+            if (field.type === 'utf16') {
+                return this.getUtf16(field);
+            } else if (field.type === 'u16') {
+                return this.getU16(field);
             }
         },
-        getUtf16(view, usedLength) {
-            const bytes = new Uint8Array(view.buffer, 0, usedLength*2);
+        getUtf16(field) {
+            const {
+                view,
+                bytesFrom,
+                usedLength,
+            } = field;
+
+            const bytes = new Uint8Array(view.buffer, bytesFrom, usedLength*2);
             return new TextDecoder("utf-16le").decode(bytes);
         },
-        getU16(view) {
+        getU16(field) {
+            const {
+                view,
+            } = field;
+
             return view[0];
         }
     }
